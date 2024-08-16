@@ -1,0 +1,102 @@
+::-webkit-scrollbar {
+  background: rgb(214, 214, 214);
+}
+::-webkit-scrollbar:horizontal {
+  height: 14px;
+  width: 4px;
+  border-radius: 0px 0px 6px 6px;
+}
+::-webkit-scrollbar:vertical {
+  height: 100%;
+  width: 14px;
+}
+::-webkit-scrollbar-thumb:horizontal {
+  background: rgb(145, 145, 145);
+  border-radius: 6px;
+  border: 2px solid rgb(214, 214, 214);
+}
+::-webkit-scrollbar-thumb:horizontal:hover {
+  background: rgb(120, 120, 120);
+}
+::-webkit-scrollbar-thumb:vertical {
+  background: rgb(145, 145, 145);
+  border-radius: 6px;
+  border: 2px solid rgb(214, 214, 214);
+}
+::-webkit-scrollbar-thumb:vertical:hover {
+  background: rgb(120, 120, 120);
+}
+
+.no_scrollbar {
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.no_scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.gradient_bg_dark_to_darker {
+  background-image: linear-gradient(90deg, #004283 0%, #00264b 100%);
+  width: 100%;
+  height: 100%;
+}
+
+.gradient_bg_darker_to_dark {
+  background-image: linear-gradient(90deg, #00264b 0%, #004283 100%);
+  width: 100%;
+  height: 100%;
+}
+
+.gradient_bg_light_to_dark {
+  background-image: linear-gradient(90deg, #1e90ff 0%, #004283 100%);
+  width: 100%;
+  height: 100%;
+}
+
+.gradient_bg_dark_to_light {
+  background-image: linear-gradient(90deg, #004283 0%, #1e90ff 100%);
+  width: 100%;
+  height: 100%;
+}
+
+.gradient_bg_light_to_dark_gray {
+  background-image: linear-gradient(0deg, #ffffff 0%, #e0e0e0 50%, #ffffff 100%);
+  width: 100%;
+  height: 100%;
+}
+
+.fade-out-div::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none; /* Ensures that it doesn't interfere with any interactions */
+  background-image: linear-gradient(to bottom, transparent 30%, white);
+  z-index: 1;
+}
+
+.table_col_gap_sm th,
+.table_col_gap_sm td {
+  font-size: 12px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.chakra-modal__overlay {
+  z-index: 1 !important;
+}
+.chakra-modal__content-container {
+  z-index: 2 !important;
+}
+
+.joyride-tooltip,
+.joyride-overlay,
+.joyride-beacon {
+  position: relative !important;
+}

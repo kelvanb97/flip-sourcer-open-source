@@ -1,0 +1,26 @@
+# shared
+node_modules
+coverage
+/scripts/env
+dist
+.env
+.env.local
+*.pem
+SANDBOX
+.vscode
+logs
+.cache_ggshield
+
+# CDK
+packages/cdk/.cdk.staging
+packages/cdk/.cdk.out
+packages/cdk/cdk.out
+
+# FE
+packages/front-end/.next
+packages/front-end/tsconfig.tsbuildinfo
+packages/front-end/next-env.d.ts
+
+# BACKEND
+packages/back-end/prisma/ERD.svg
+packages/back-end/prisma/generated/client

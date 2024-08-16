@@ -1,0 +1,30 @@
+{
+  "name": "retailer-service",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "SECRET_ID=DevWebApiSecret LOGGING_ENABLED=true ts-node src/index.ts",
+    "prod": "SECRET_ID=ProdWebApiSecret LOGGING_ENABLED=true ts-node src/index.ts",
+    "start:dist:dev": "SECRET_ID=DevWebApiSecret node dist/fargate/scraping-services/retailer-service/src/index.js",
+    "start:dist:prod": "SECRET_ID=ProdWebApiSecret node dist/fargate/scraping-services/retailer-service/src/index.js",
+    "build": "rm -rf node_modules && yarn && rm -rf ./dist && tsc",
+    "postbuild": "mkdir -p ./dist/prisma/generated && cp -r ../../../prisma/generated/client ./dist/prisma/generated/client",
+    "depcheck": "depcheck"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ecs": "^3.359.0",
+    "@aws-sdk/client-secrets-manager": "^3.359.0",
+    "@aws-sdk/credential-provider-imds": "^3.357.0",
+    "axios": "^1.4.0",
+    "axios-retry": "^3.5.0",
+    "deasync-promise": "^1.0.1",
+    "jsdom": "^22.1.0"
+  },
+  "devDependencies": {
+    "@types/deasync-promise": "^1.0.0",
+    "@types/jsdom": "^21.1.1",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.1",
+    "typescript": "5.0.4"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "cdk",
+  "version": "0.1.0",
+  "private": true,
+  "bin": {
+    "cdk": "bin/cdk.js"
+  },
+  "scripts": {
+    "depcheck": "depcheck",
+    "build": "echo 'no build for cdk'",
+    "clean": "rm -rf cdk.out/*",
+    "build:api": "(cd ../back-end/fargate/api-service && yarn build)",
+    "build:scraper": "yarn build:retailer && yarn build:amazon && yarn build:keepa && yarn build:gptProductTitleMatcher",
+    "build:retailer": "(cd ../back-end/fargate/scraping-services/retailer-service && yarn build)",
+    "build:amazon": "(cd ../back-end/fargate/scraping-services/amazon-service && yarn build)",
+    "build:keepa": "(cd ../back-end/fargate/keepa-service && yarn build)",
+    "build:gptProductTitleMatcher": "(cd ../back-end/fargate/gpt-product-title-matcher-service && yarn build)",
+    "build:lambdas": "yarn build:scraper-chron-service && yarn build:product-matcher-service",
+    "build:scraper-chron-service": "(cd ../back-end/lambda/scraper-chron-service && yarn build)",
+    "build:variation-matcher-service": "(cd ../back-end/lambda/variation-matcher-service && yarn build)",
+    "build:product-matcher-service": "(cd ../back-end/lambda/product-matcher-service && yarn build)",
+    "deploy:api:dev": "yarn clean && . ../../scripts/env/dev.sh && yarn build:api && yarn cdk deploy DevWebApiStack --require-approval never",
+    "deploy:scraper:dev": "yarn clean && . ../../scripts/env/dev.sh && yarn build:scraper && yarn cdk deploy DevFargateScraperStack --require-approval never",
+    "deploy:lambda:dev": "yarn clean && . ../../scripts/env/dev.sh && yarn build:lambdas && yarn cdk deploy DevLambdaStack --require-approval never",
+    "deploy:all:dev": "yarn deploy:api:dev && yarn deploy:scraper:dev && yarn deploy:lambda:dev",
+    "deploy:api:prod": "yarn clean && . ../../scripts/env/prod.sh && yarn build:api && yarn cdk deploy ProdWebApiStack --require-approval never",
+    "deploy:scraper:prod": "yarn clean && . ../../scripts/env/prod.sh && yarn build:scraper && yarn cdk deploy ProdFargateScraperStack --require-approval never",
+    "deploy:lambda:prod": "yarn clean && . ../../scripts/env/prod.sh && yarn build:lambdas && yarn cdk deploy ProdLambdaStack --require-approval never",
+    "deploy:all:prod": "yarn deploy:api:prod && yarn deploy:scraper:prod && yarn deploy:lambda:prod"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.0",
+    "aws-cdk": "^2.85.0",
+    "aws-cdk-lib": "2.62.2",
+    "constructs": "^10.2.59",
+    "source-map-support": "^0.5.21"
+  }
+}

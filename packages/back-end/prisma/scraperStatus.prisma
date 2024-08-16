@@ -1,0 +1,9 @@
+model ScraperStatus {
+    id                   Int      @id @default(autoincrement())
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @default(now()) @updatedAt
+    pdpStarted           Boolean  @default(false)
+    gptTitleMatchStarted Boolean  @default(false)
+    keepaStarted         Boolean  @default(false)
+    deletedOldProducts   Boolean  @default(false)
+}

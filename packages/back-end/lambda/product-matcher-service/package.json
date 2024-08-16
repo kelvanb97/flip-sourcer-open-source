@@ -1,0 +1,31 @@
+{
+  "name": "product-matcher-service",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "local": "sls offline start --noTimeout",
+    "build:start:local": "yarn build && yarn local",
+    "docker:start": "yarn build && docker build -t product-matcher-service . && docker run -p 4001:8080 product-matcher-service",
+    "docker:kill": "docker stop product-matcher-service && docker rm product-matcher-service",
+    "build": "rm -rf node_modules && yarn && rm -rf ./dist && tsc",
+    "depcheck": "depcheck"
+  },
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.370.0",
+    "@tensorflow-models/coco-ssd": "^2.2.2",
+    "@tensorflow-models/mobilenet": "^2.1.0",
+    "@tensorflow-models/universal-sentence-encoder": "^1.3.3",
+    "@tensorflow/tfjs-node": "^4.8.0",
+    "aws-lambda": "^1.0.7",
+    "axios": "^1.4.0",
+    "deasync-promise": "^1.0.1",
+    "sharp": "^0.32.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.119",
+    "@types/deasync-promise": "^1.0.0",
+    "serverless": "^3.33.0",
+    "serverless-offline": "^12.0.4",
+    "typescript": "5.0.4"
+  }
+}

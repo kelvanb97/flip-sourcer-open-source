@@ -1,0 +1,294 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["orderByNulls"]
+    binaryTargets   = ["native", "debian-openssl-3.0.x", "rhel-openssl-1.0.x"]
+    output          = "./generated/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id                        Int             @id @default(autoincrement())
+    createdAt                 DateTime        @default(now())
+    name                      String          @default("")
+    email                     String          @unique
+    emailVerified             Boolean         @default(false)
+    emailVerificationToken    String?
+    lastEmailVerificationSent DateTime?
+    isInfluencer              Boolean         @default(false)
+    password                  String
+    updatedAt                 DateTime        @updatedAt
+    sessionToken              String
+    sessionExpiration         DateTime
+    referrer                  String?
+    affiliateId               String?         @unique
+    productBlackList          String[]        @default([])
+    savedProducts             SavedProduct[]
+    superDelete               Boolean         @default(false)
+    mailchimpAudiences        String[]        @default([])
+    stripe                    StripeInfo      @relation(fields: [stripeInfoId], references: [id])
+    stripeInfoId              Int             @unique
+    amazonSpApi               AmazonSpApi     @relation(fields: [amazonSpApiId], references: [id])
+    amazonSpApiId             Int             @unique
+    generalSettings           GeneralSettings @relation(fields: [generalSettingsId], references: [id])
+    generalSettingsId         Int             @unique
+}
+
+model SavedProduct {
+    id          Int      @id @default(autoincrement())
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    productInfo Json
+    user        User?    @relation(fields: [userId], references: [id])
+    userId      Int?
+}
+
+model StripeInfo {
+    id                     Int      @id @default(autoincrement())
+    createdAt              DateTime @default(now())
+    updatedAt              DateTime @updatedAt
+    customerId             String
+    defaultPaymentMethodId String
+    user                   User?
+}
+
+model AmazonSpApi {
+    id           Int      @id @default(autoincrement())
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    lastUsedAt   DateTime @default(now())
+    sellerId     String
+    accessToken  String
+    refreshToken String
+    user         User?
+}
+
+model GeneralSettings {
+    id                Int           @id @default(autoincrement())
+    createdAt         DateTime      @default(now())
+    updatedAt         DateTime      @updatedAt
+    defaultFbaFee     Float
+    measurementSystem String
+    perUnitCostsId    Int           @unique
+    shippingCostsId   Int           @unique
+    cashbackId        Int           @unique
+    perUnitCosts      PerUnitCosts  @relation(fields: [perUnitCostsId], references: [id])
+    shippingCosts     ShippingCosts @relation(fields: [shippingCostsId], references: [id])
+    cashback          Cashback      @relation(fields: [cashbackId], references: [id])
+    user              User?
+}
+
+model PerUnitCosts {
+    id                Int              @id @default(autoincrement())
+    createdAt         DateTime         @default(now())
+    updatedAt         DateTime         @updatedAt
+    flat              Float
+    percent           Float
+    generalSettingsId Int?
+    generalSettings   GeneralSettings?
+}
+
+model ShippingCosts {
+    id                Int              @id @default(autoincrement())
+    createdAt         DateTime         @default(now())
+    updatedAt         DateTime         @updatedAt
+    perPound          Float
+    perOunce          Float
+    perKilogram       Float
+    perGram           Float
+    perUnit           Float
+    generalSettingsId Int?
+    generalSettings   GeneralSettings?
+}
+
+model Cashback {
+    id                Int              @id @default(autoincrement())
+    createdAt         DateTime         @default(now())
+    updatedAt         DateTime         @updatedAt
+    flat              Float
+    percent           Float
+    generalSettingsId Int?
+    generalSettings   GeneralSettings?
+}
+model Product {
+    id                       Int                @id @default(autoincrement())
+    createdAt                DateTime           @default(now())
+    updatedAt                DateTime           @default(now()) @updatedAt
+    matchType                String
+    matchScore               Float
+    matchScoreBreakdown      Json               @default("{}")
+    gptTitleMatchScore       Float              @default(0)
+    gptTitleMatchIterations  Int                @default(0)
+    gptTitleMatchLock        Boolean            @default(false)
+    highestRoiByCondition    Float?
+    highestProfitByCondition Float?
+    retailerInfo             RetailerInfo       @relation(fields: [retailerInfoId], references: [id])
+    retailerInfoId           Int                @unique
+    amazonInfo               AmazonInfo         @relation(fields: [amazonInfoId], references: [id])
+    amazonInfoId             Int
+    valueByCondition         ValueByCondition[]
+}
+
+// Profit are written from SPAPI service
+// ROI is written from SPAPI service
+// Lowest offer is written from PDP scraper
+// Fees by condition are written from SPAPI service
+model ValueByCondition {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    condition String
+    value     Float
+    type      String // Profit, ROI, lowest offer, or Fees
+    product   Product? @relation(fields: [productId], references: [id])
+    productId Int?
+}
+
+model AmazonInfo {
+    id                Int       @id @default(autoincrement())
+    products          Product[]
+    createdAt         DateTime  @default(now())
+    updatedAt         DateTime  @updatedAt
+    asin              String    @unique
+    productName       String
+    productLink       String
+    productImageLink  String
+    hasBuyBox         Boolean
+    buyBoxPrice       Float?
+    category          String
+    offers            Json
+    amazonOnListing   Boolean
+    reviewCount       Int?
+    rating            Float?
+    dimensions        Json
+    weight            Json
+    lastKeepaPollTime DateTime?
+    lastSPAPIPollTime DateTime?
+
+    //Chart data
+    chartHistoricalDatum Json?
+
+    //Keepa data
+    salesRankFlat      Int?
+    salesRankPercent   Float?
+    salesRank30DayAvg  Int?
+    salesRank60DayAvg  Int?
+    salesRank90DayAvg  Int?
+    salesRank180DayAvg Int?
+
+    salesRankDrops30  Int?
+    salesRankDrops90  Int?
+    salesRankDrops180 Int?
+
+    reviewCount90DayAvg  Int?
+    reviewCount180DayAvg Int?
+
+    buyBoxCurrent   Float?
+    buyBox90DayAvg  Float?
+    buyBox180DayAvg Float?
+    buyBoxStock     Int?
+    buyBox90DayOos  Float?
+
+    amazon90DayOos Float?
+
+    newCurrent   Float?
+    new90DayAvg  Float?
+    new180DayAvg Float?
+    new90DayOos  Float?
+
+    new3rdPartyFbaCurrent   Float?
+    new3rdPartyFba90DayAvg  Float?
+    new3rdPartyFba180DayAvg Float?
+
+    new3rdPartyFbmCurrent   Float?
+    new3rdPartyFbm90DayAvg  Float?
+    new3rdPartyFbm180DayAvg Float?
+
+    used90DayOos Float?
+
+    newOfferCount          Int?
+    newOfferCount30DayAvg  Int?
+    newOfferCount90DayAvg  Int?
+    newOfferCount180DayAvg Int?
+
+    countOfRetrievedLiveOffersFba Int?
+    countOfRetrievedLiveOffersFbm Int?
+}
+
+// Data from the monthly query
+model KeepaNumProductsInCategory {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    numProduct Int
+    category   String
+}
+
+model RetailerInfo {
+    id                     Int                      @id @default(autoincrement())
+    createdAt              DateTime                 @default(now())
+    updatedAt              DateTime                 @updatedAt
+    siteName               String
+    productName            String
+    productUpc             String?
+    productCost            Float
+    productCostUsed        Float?
+    productLink            String                   @unique
+    productImageLink       String
+    productInStock         Boolean?
+    productStock           String?
+    retailerHistoricalData RetailerHistoricalData[]
+
+    product   Product?
+    productId Int?     @unique
+}
+
+model RetailerProductIndex {
+    id               Int      @id @default(autoincrement())
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt
+    productLink      String   @unique
+    productImageLink String
+    retailer         String
+    pdpInfo          Json     @default("{}")
+    locked           Boolean  @default(false)
+    lockedBy         String   @default("")
+    errorCount       Int      @default(0)
+}
+
+model RetailerProductDiscoveryBookmark {
+    id                  Int      @id @default(autoincrement())
+    createdAt           DateTime @default(now())
+    updatedAt           DateTime @updatedAt
+    baseUrl             String   @unique
+    endingUrl           String   @unique
+    retailer            String
+    successfulPageCount Int      @default(0)
+    locked              Boolean  @default(false)
+    lockedBy            String   @default("")
+    errorCount          Int      @default(0)
+    completed           Boolean  @default(false)
+}
+
+model RetailerHistoricalData {
+    id             Int          @id @default(autoincrement())
+    createdAt      DateTime     @default(now())
+    updatedAt      DateTime     @updatedAt
+    timestamp      String
+    value          Float
+    type           String
+    RetailerInfo   RetailerInfo @relation(fields: [retailerInfoId], references: [id])
+    retailerInfoId Int
+}
+model ScraperStatus {
+    id                   Int      @id @default(autoincrement())
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @default(now()) @updatedAt
+    pdpStarted           Boolean  @default(false)
+    gptTitleMatchStarted Boolean  @default(false)
+    keepaStarted         Boolean  @default(false)
+    deletedOldProducts   Boolean  @default(false)
+}

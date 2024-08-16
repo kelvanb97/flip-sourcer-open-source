@@ -1,0 +1,115 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["orderByNulls"]
+    binaryTargets   = ["native", "debian-openssl-3.0.x", "rhel-openssl-1.0.x"]
+    output          = "./generated/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id                        Int             @id @default(autoincrement())
+    createdAt                 DateTime        @default(now())
+    name                      String          @default("")
+    email                     String          @unique
+    emailVerified             Boolean         @default(false)
+    emailVerificationToken    String?
+    lastEmailVerificationSent DateTime?
+    isInfluencer              Boolean         @default(false)
+    password                  String
+    updatedAt                 DateTime        @updatedAt
+    sessionToken              String
+    sessionExpiration         DateTime
+    referrer                  String?
+    affiliateId               String?         @unique
+    productBlackList          String[]        @default([])
+    savedProducts             SavedProduct[]
+    superDelete               Boolean         @default(false)
+    mailchimpAudiences        String[]        @default([])
+    stripe                    StripeInfo      @relation(fields: [stripeInfoId], references: [id])
+    stripeInfoId              Int             @unique
+    amazonSpApi               AmazonSpApi     @relation(fields: [amazonSpApiId], references: [id])
+    amazonSpApiId             Int             @unique
+    generalSettings           GeneralSettings @relation(fields: [generalSettingsId], references: [id])
+    generalSettingsId         Int             @unique
+}
+
+model SavedProduct {
+    id          Int      @id @default(autoincrement())
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    productInfo Json
+    user        User?    @relation(fields: [userId], references: [id])
+    userId      Int?
+}
+
+model StripeInfo {
+    id                     Int      @id @default(autoincrement())
+    createdAt              DateTime @default(now())
+    updatedAt              DateTime @updatedAt
+    customerId             String
+    defaultPaymentMethodId String
+    user                   User?
+}
+
+model AmazonSpApi {
+    id           Int      @id @default(autoincrement())
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    lastUsedAt   DateTime @default(now())
+    sellerId     String
+    accessToken  String
+    refreshToken String
+    user         User?
+}
+
+model GeneralSettings {
+    id                Int           @id @default(autoincrement())
+    createdAt         DateTime      @default(now())
+    updatedAt         DateTime      @updatedAt
+    defaultFbaFee     Float
+    measurementSystem String
+    perUnitCostsId    Int           @unique
+    shippingCostsId   Int           @unique
+    cashbackId        Int           @unique
+    perUnitCosts      PerUnitCosts  @relation(fields: [perUnitCostsId], references: [id])
+    shippingCosts     ShippingCosts @relation(fields: [shippingCostsId], references: [id])
+    cashback          Cashback      @relation(fields: [cashbackId], references: [id])
+    user              User?
+}
+
+model PerUnitCosts {
+    id                Int              @id @default(autoincrement())
+    createdAt         DateTime         @default(now())
+    updatedAt         DateTime         @updatedAt
+    flat              Float
+    percent           Float
+    generalSettingsId Int?
+    generalSettings   GeneralSettings?
+}
+
+model ShippingCosts {
+    id                Int              @id @default(autoincrement())
+    createdAt         DateTime         @default(now())
+    updatedAt         DateTime         @updatedAt
+    perPound          Float
+    perOunce          Float
+    perKilogram       Float
+    perGram           Float
+    perUnit           Float
+    generalSettingsId Int?
+    generalSettings   GeneralSettings?
+}
+
+model Cashback {
+    id                Int              @id @default(autoincrement())
+    createdAt         DateTime         @default(now())
+    updatedAt         DateTime         @updatedAt
+    flat              Float
+    percent           Float
+    generalSettingsId Int?
+    generalSettings   GeneralSettings?
+}

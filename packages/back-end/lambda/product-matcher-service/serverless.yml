@@ -1,0 +1,24 @@
+service: DevProductMatcherLambda
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  environment:
+    SECRET_ID: DevWebApiSecret
+    LOGGING_ENABLED: true
+    IS_OFFLINE: true
+
+functions:
+  calculateSimilarityScore:
+    handler: dist/index.similarityScoreHandler
+    events:
+      - http:
+          path: calculate-product-similarity-score
+          method: post
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 4001

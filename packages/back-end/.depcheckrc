@@ -1,0 +1,1 @@
+ignores: ["@prisma/client", "@types/jest"]
